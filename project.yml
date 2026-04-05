@@ -4,7 +4,6 @@ options:
   deploymentTarget:
     iOS: 16.0
   createIntermediateGroups: true
-  projectFormat: "56"
 
 settings:
   base:
