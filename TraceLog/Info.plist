@@ -10,5 +10,7 @@
 	<string>TraceLog needs access to your location to track where you've been.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>TraceLog tracks your location in the background to record your movements efficiently.</string>
+	<key>UILaunchScreen</key>
+	<dict/>
 </dict>
 </plist>
