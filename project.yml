@@ -5,6 +5,7 @@ options:
     iOS: 16.0
   xcodeVersion: "15.4"
   createIntermediateGroups: true
+  objectVersion: 56
 
 settings:
   base:
