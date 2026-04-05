@@ -67,15 +67,7 @@ jobs:
         run: brew install xcodegen
 
       - name: List available simulators
-        run: |
-          xcrun simctl list devices available -j | python3 -c "
-import sys, json
-data = json.load(sys.stdin)
-for runtime, devices in data.get('devices', {}).items():
-    if 'iOS' in runtime:
-        for d in devices:
-            print(f'  {d[\"name\"]} [{runtime}]')
-          " || true
+        run: xcrun simctl list devices available || true
 
       - name: Generate Xcode project
         run: xcodegen generate
