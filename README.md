@@ -73,35 +73,19 @@ TraceLog/
 swift build
 ```
 
-### Codemagic CI/CD (no Xcode needed)
+### GitHub Actions (automatic)
 
-**1. Push to GitHub**
+Every push to `main` triggers a build. No setup needed — just push.
+
 ```bash
-cd /Users/jupy/workspace/TraceLog
-git init
 git add .
-git commit -m "initial commit"
-git remote add origin git@github.com:YOUR_USERNAME/tracelog.git
-git push -u origin main
+git commit -m "your changes"
+git push
 ```
 
-**2. Connect to Codemagic**
-- Go to [codemagic.io](https://codemagic.io) → Sign in with GitHub
-- Click "Add application" → select your repo
+Check build status: **Actions** tab on your GitHub repo page.
 
-**3. Set up Code Signing (for TestFlight)**
-- In Codemagic dashboard → Team → Integrations → App Store Connect
-- Add your Apple API key (from [App Store Connect](https://appstoreconnect.apple.com/access/api))
-- Name the integration `TraceLogAppStoreConnect`
-
-**4. Trigger Build**
-- Push to `main` → triggers `ios-build` workflow (unsigned build)
-- Create a tag → triggers `ios-release` workflow (TestFlight upload)
-  ```bash
-  git tag v1.0.0 && git push origin v1.0.0
-  ```
-
-**Generated `.ipa`** appears in Codemagic build artifacts.
+**Free tier:** 2,000 min/month (macOS = 10x multiplier → ~200 real minutes, ~40-60 builds/month).
 
 ### Local (requires Xcode)
 1. `brew install xcodegen`
