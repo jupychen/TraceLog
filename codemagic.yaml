@@ -1,0 +1,173 @@
+# Codemagic CI/CD configuration for TraceLog
+# Docs: https://docs.codemagic.io/yaml-quick-start/
+
+definitions:
+  environment:
+    ios_environment:
+      ios: 17.0
+      xcode: latest
+      cocoapods: default
+
+workflows:
+  ios-build:
+    name: TraceLog iOS Build
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    environment:
+      ios: 17.0
+      xcode: latest
+      vars:
+        APP_ID: com.tracelog.app
+        SCHEME: TraceLog
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: "main"
+          include: true
+          source: true
+
+    cache:
+      cache_paths:
+        - $HOME/Library/Developer/Xcode/DerivedData
+
+    scripts:
+      - name: Install xcodegen
+        script: |
+          brew install xcodegen
+
+      - name: Generate Xcode project
+        script: |
+          cd $CM_BUILD_DIR
+          xcodegen generate
+
+      - name: Resolve Swift packages
+        script: |
+          cd $CM_BUILD_DIR
+          xcodebuild -resolvePackageDependencies \
+            -project TraceLog.xcodeproj \
+            -scheme $SCHEME \
+            -clonedSourcePackagesDirPath "$CM_BUILD_DIR/.build/checkouts"
+
+      - name: Build iOS app
+        script: |
+          cd $CM_BUILD_DIR
+          xcodebuild build \
+            -project TraceLog.xcodeproj \
+            -scheme "$SCHEME" \
+            -destination "generic/platform=iOS" \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Create .ipa archive
+        script: |
+          cd $CM_BUILD_DIR
+
+          # Build archive
+          xcodebuild archive \
+            -project TraceLog.xcodeproj \
+            -scheme "$SCHEME" \
+            -destination "generic/platform=iOS" \
+            -archivePath build/TraceLog \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO
+
+          # Export ipa (adhoc, unsigned)
+          mkdir -p build/Export
+          cat > build/ExportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>development</string>
+              <key>compileBitcode</key>
+              <false/>
+          </dict>
+          </plist>
+          EOF
+
+    artifacts:
+      - build/*.xcarchive
+      - build/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      email:
+        recipients:
+          - recipient@example.com
+      scripts:
+        - name: Build complete
+          script: |
+            echo "Build completed! Check artifacts above."
+            ls -la build/ 2>/dev/null || true
+
+  # Workflow with code signing + TestFlight distribution
+  ios-release:
+    name: TraceLog Release → TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    environment:
+      ios: 17.0
+      xcode: latest
+      vars:
+        APP_ID: com.tracelog.app
+        SCHEME: TraceLog
+      groups:
+        - app_store_connect  # Set up in Codemagic dashboard
+
+    triggering:
+      events:
+        - tag
+      branch_patterns:
+        - pattern: "*"
+          include: true
+          source: true
+
+    integrations:
+      app_store_connect: TraceLogAppStoreConnect  # Name from dashboard
+
+    scripts:
+      - name: Install xcodegen
+        script: |
+          brew install xcodegen
+
+      - name: Generate Xcode project
+        script: |
+          xcodegen generate
+
+      - name: Build & Archive
+        script: |
+          xcodebuild archive \
+            -project TraceLog.xcodeproj \
+            -scheme "$SCHEME" \
+            -destination "generic/platform=iOS" \
+            -archivePath build/TraceLog
+
+      - name: Export .ipa
+        script: |
+          mkdir -p build/Export
+          xcodebuild -exportArchive \
+            -archivePath build/TraceLog.xcarchive \
+            -exportPath build/Export \
+            -exportOptionsPlist build/ExportOptions.plist
+
+      - name: Upload to TestFlight
+        script: |
+          xcrun altool --upload-app \
+            -f build/Export/*.ipa \
+            -t ios \
+            --apiKey $APP_STORE_CONNECT_KEY_IDENTIFIER \
+            --apiIssuer $APP_STORE_CONNECT_ISSUER_ID
+
+    artifacts:
+      - build/Export/*.ipa
+      - build/*.xcarchive
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true

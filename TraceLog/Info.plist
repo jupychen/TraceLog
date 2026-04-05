@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>TraceLog needs access to your location to track where you've been.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>TraceLog tracks your location in the background to record your movements efficiently.</string>
+</dict>
+</plist>
