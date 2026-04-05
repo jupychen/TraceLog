@@ -41,6 +41,34 @@ jobs:
           echo "=== FULL BUILD LOG ==="
           cat build.log
 
+      - name: Package .ipa
+        run: |
+          # Find the built .app
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "TraceLog.app" -type d | head -1)
+          echo "Found app at: $APP_PATH"
+
+          if [ -n "$APP_PATH" ]; then
+            mkdir -p ipa-build
+            mkdir -p ipa-build/Payload
+            cp -R "$APP_PATH" ipa-build/Payload/
+            cd ipa-build
+            zip -r -q TraceLog.ipa Payload
+            cd ..
+            echo "Created ipa:"
+            ls -lh ipa-build/TraceLog.ipa
+          else
+            echo "ERROR: Could not find TraceLog.app"
+            find ~/Library/Developer/Xcode/DerivedData -name "*.app" -type d 2>/dev/null | head -10
+          fi
+
+      - name: Upload .ipa
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TraceLog-ipa
+          path: ipa-build/TraceLog.ipa
+          retention-days: 7
+
       - name: Upload build log
         if: always()
         uses: actions/upload-artifact@v4
