@@ -18,9 +18,11 @@ jobs:
 
       - name: Select Xcode
         run: |
-          echo "Available Xcode versions:"
-          ls /Applications/ | grep Xcode
-          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer 2>/dev/null || \
+          # List available Xcode versions
+          ls /Applications/ | grep -i xcode || true
+          # Prefer Xcode 16+
+          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer 2>/dev/null || \
+          sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer 2>/dev/null || \
           sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer 2>/dev/null || \
           sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
           xcodebuild -version

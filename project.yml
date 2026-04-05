@@ -3,9 +3,8 @@ options:
   bundleIdPrefix: com.tracelog
   deploymentTarget:
     iOS: 16.0
-  xcodeVersion: "15.0"
+  xcodeVersion: "16.0"
   createIntermediateGroups: true
-  generateEmptyDirectories: true
 
 settings:
   base:
