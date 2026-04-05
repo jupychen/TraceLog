@@ -37,8 +37,9 @@ jobs:
             -configuration Release \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            | tee build.log
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee build.log || true
+          echo "=== FULL BUILD LOG ==="
+          cat build.log
 
       - name: Upload build log
         if: always()
