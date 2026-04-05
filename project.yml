@@ -13,6 +13,7 @@ settings:
     TARGETED_DEVICE_FAMILY: "1"
     INFOPLIST_FILE: TraceLog/Info.plist
     GENERATE_INFOPLIST_FILE: YES
+    SWIFT_STRICT_CONCURRENCY: minimal
     INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
     INFOPLIST_KEY_UILaunchScreen_Generation: YES
     INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"

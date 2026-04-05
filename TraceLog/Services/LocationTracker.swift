@@ -1,6 +1,5 @@
 import Foundation
 import CoreLocation
-import SwiftUI
 
 @MainActor
 class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
@@ -69,7 +68,7 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
         manager.startUpdatingLocation()
 
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
-            Task { @MainActor [weak self] in
+            Task { @MainActor in
                 self?.checkLocation()
             }
         }
@@ -130,18 +129,17 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     // MARK: - CLLocationManagerDelegate
 
-    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         Task { @MainActor in
             self.currentLocation = location
-
             if self.isTracking {
                 self.processLocation(location)
             }
         }
     }
 
-    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         Task { @MainActor in
             switch manager.authorizationStatus {
             case .authorizedAlways, .authorizedWhenInUse:
@@ -156,7 +154,7 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
 
-    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Location error: \(error.localizedDescription)")
     }
 
