@@ -3,9 +3,8 @@ options:
   bundleIdPrefix: com.tracelog
   deploymentTarget:
     iOS: 16.0
-  xcodeVersion: "15.4"
   createIntermediateGroups: true
-  objectVersion: 56
+  projectFormat: "56"
 
 settings:
   base:

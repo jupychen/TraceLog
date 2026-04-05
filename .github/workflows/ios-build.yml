@@ -21,20 +21,11 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
           xcodebuild -version
 
-      - name: Install xcodegen (pinned version)
-        run: |
-          brew install xcodegen@2.43.0 || brew install xcodegen
-
-      - name: Debug xcodegen
-        run: xcodegen --version
+      - name: Install xcodegen
+        run: brew install xcodegen
 
       - name: Generate Xcode project
         run: xcodegen generate
-
-      - name: Check project format
-        run: |
-          echo "--- objectVersion ---"
-          grep -E 'objectVersion|Project object' TraceLog.xcodeproj/project.pbxproj | head -5
 
       - name: Build iOS app
         run: |
@@ -71,16 +62,10 @@ jobs:
           xcodebuild -version
 
       - name: Install xcodegen
-        run: |
-          brew install xcodegen@2.43.0 || brew install xcodegen
+        run: brew install xcodegen
 
       - name: Generate Xcode project
         run: xcodegen generate
-
-      - name: Check project format
-        run: |
-          echo "--- objectVersion ---"
-          grep -E 'objectVersion|Project object' TraceLog.xcodeproj/project.pbxproj | head -5
 
       - name: Build for Simulator
         run: |
